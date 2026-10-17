@@ -1,0 +1,16 @@
+{
+  "name": "twisted-tracker",
+  "version": "1.0.0",
+  "description": "Slack bot to track Hackclub's Twisted pathways/shop. ",
+  "repository": {
+    "type": "git",
+    "url": "twisted-tracker"
+  },
+  "license": "ISC",
+  "author": "xFN10x",
+  "type": "commonjs",
+  "main": "src/index.ts",
+  "scripts": {
+    "debug": "node src/index.ts"
+  }
+}
