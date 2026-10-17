@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@slack/bolt": "^5.1.0",
+    "any-date-parser": "^2.2.4",
     "dotenv": "^18.0.8",
+    "ky": "^2.1.0",
+    "node-html-parser": "^9.0.4",
     "slack-block-builder": "^2.8.0"
   },
   "devDependencies": {

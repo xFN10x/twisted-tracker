@@ -2,6 +2,7 @@ import { App } from "@slack/bolt";
 import { config } from "dotenv";
 import { BlockCollection, Blocks, Elements } from "slack-block-builder";
 import type { ChatPostMessageArguments } from "@slack/web-api/dist/types/request/chat";
+import twistedGetDocument from "./scraper";
 
 config();
 
@@ -25,7 +26,9 @@ async function onStart() {
     channel: process.env.CHANNEL_ID ?? "",
     text: "test?",
     blocks: BlockCollection(
-      Blocks.Section({ text: "AAAAAAAAA" }),
+      Blocks.Section({
+        text: "Hey! I was restarted! Maybe I died or something...",
+      }),
       Blocks.Actions().elements(
         Elements.Button({ text: "Damn", actionId: "cliked" }),
       ),
@@ -33,15 +36,17 @@ async function onStart() {
   });
 }
 
-SApp.action('cliked', async ({ action, ack }) => {
+SApp.action("cliked", async ({ action, ack }) => {
   await ack();
-  console.log(action)
+  //console.log(action)
 
   await sendMsg({
     channel: process.env.CHANNEL_ID ?? "",
     text: "test???",
     blocks: BlockCollection(Blocks.Section({ text: `"Damn!"` })),
   });
+  const testDoc = await twistedGetDocument("dashboard/frame/pathways/");
+  console.log(testDoc?.querySelectorAll(".shadow-sm"));
 });
 
 (async () => {
