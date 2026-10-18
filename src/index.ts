@@ -2,7 +2,7 @@ import { App } from "@slack/bolt";
 import { config } from "dotenv";
 import { BlockCollection, Blocks, Elements } from "slack-block-builder";
 import type { ChatPostMessageArguments } from "@slack/web-api/dist/types/request/chat";
-import twistedGetDocument from "./scraper";
+import twistedGetDocument, { getPathways } from "./scraper";
 
 config();
 
@@ -16,40 +16,44 @@ if (process.env.CHANNEL_ID === undefined) {
   process.exit(1);
 }
 
-async function sendMsg(args: ChatPostMessageArguments) {
+export async function sendMsgDebug(mardown: string) {
+	await sendMsg({
+        channel: process.env.CHANNEL_ID ?? "",
+        text: mardown,
+        blocks: BlockCollection(
+          Blocks.Context().elements(
+            mardown,
+          ),
+        ),
+      });
+}
+
+export async function sendMsgMrkDwn(markdown: string) {
+  await sendMsg({
+    channel: process.env.CHANNEL_ID ?? "",
+    markdown_text: markdown,
+  });
+}
+export async function sendMsg(args: ChatPostMessageArguments) {
   let chat = SApp.client.chat;
   chat.postMessage(args);
 }
 
 async function onStart() {
-  await sendMsg({
-    channel: process.env.CHANNEL_ID ?? "",
-    text: "test?",
-    blocks: BlockCollection(
-      Blocks.Section({
-        text: "Hey! I was restarted! Maybe I died or something...",
-      }),
-      Blocks.Actions().elements(
-        Elements.Button({ text: "Damn", actionId: "cliked" }),
-      ),
-    ),
-  });
+  await sendMsgMrkDwn("Hey! I was restarted! Maybe I died or something...")
 }
 
-SApp.action("cliked", async ({ action, ack }) => {
+SApp.command("/tt-update", async ({ payload, say, ack }) => {
   await ack();
-  //console.log(action)
-
-  await sendMsg({
-    channel: process.env.CHANNEL_ID ?? "",
-    text: "test???",
-    blocks: BlockCollection(Blocks.Section({ text: `"Damn!"` })),
-  });
-  const testDoc = await twistedGetDocument("dashboard/frame/pathways/");
-  console.log(testDoc?.querySelectorAll(".shadow-sm"));
+  if (payload.user_id == process.env.OWNER_ID) {
+    config();
+    getPathways();
+    sendMsgDebug("Updated.");
+  }
 });
 
 (async () => {
+  console.log("App starting...");
   await SApp.start();
   await onStart();
   console.log("App running...");
