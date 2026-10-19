@@ -2,7 +2,7 @@ import { App } from "@slack/bolt";
 import { config } from "dotenv";
 import { BlockCollection, Blocks, Elements } from "slack-block-builder";
 import type { ChatPostMessageArguments } from "@slack/web-api/dist/types/request/chat";
-import twistedGetDocument, { getPathways } from "./scraper";
+import {twistedGetDocument, getPathways, checkPathways } from "./scraper";
 
 config();
 
@@ -40,14 +40,15 @@ export async function sendMsg(args: ChatPostMessageArguments) {
 }
 
 async function onStart() {
+  checkPathways();
   await sendMsgMrkDwn("Hey! I was restarted! Maybe I died or something...")
 }
 
 SApp.command("/tt-update", async ({ payload, say, ack }) => {
   await ack();
   if (payload.user_id == process.env.OWNER_ID) {
-    config();
-    getPathways();
+    config({override: true});
+    checkPathways();
     sendMsgDebug("Updated.");
   }
 });
